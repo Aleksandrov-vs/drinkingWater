@@ -17,6 +17,7 @@ const changeRequiredVolume = require('./Stage/changeRequiredVolume')
 const getUsersList = require('./getUsersList')
 const workingWithUser = require('./Stage/workingWithUser')
 const menu = require('../appearance/keyboard/menu')
+const utility = require('./utility')
 
 
 
@@ -45,8 +46,9 @@ bot.onText(/\/start/, async msg => {
     const keyboardJSON = JSON.stringify({inline_keyboard: keyboard})
     await db.createSession(userId)
     await db.updateUserRequest(userId, 'user_name', userName)
-    const text = `привет ${userName}!\nЯ бот для контроля водного баланса.\n пожалуйста выбери свой пол`
-    await bot.sendMessage(chatId, text,{
+    const text = `Привет, <b>${userName}</b>!\nЯ бот, который поможет тебе контролировать свой водный баланс.\nДля начала работы придется указать некоторы данные😕`
+    await bot.sendMessage(chatId, text, {parse_mode:"HTML"})
+    await bot.sendMessage(chatId, 'Пожалуйста, укажите свой <u>пол</u>',{
         reply_markup: keyboardJSON,
         parse_mode:'HTML'
     })
@@ -67,6 +69,18 @@ bot.on('callback_query', async (msg) => {
         await callbackQueryChoiceDrink(userId, chatId, bot, db, callback_query, msg_id)
     } else if(command === 'changeUserInf'){
         await callbackQueryChangeUserInf(userId, chatId, bot, db, msg)
+    } else if(command === 'disableNotif'){
+
+        await db.updateNotifStatusForUser(userId, false)
+        const keyboardJSON = JSON.stringify({inline_keyboard:  inlineKeyboards.createInfMsgKeyboard(false)})
+        await bot.editMessageReplyMarkup(keyboardJSON, {chat_id: chatId, message_id: msg_id})
+
+    } else if(command === 'enableNotif'){
+
+        await db.updateNotifStatusForUser(userId, true)
+        const keyboardJSON = JSON.stringify({inline_keyboard:  inlineKeyboards.createInfMsgKeyboard(true)})
+        await bot.editMessageReplyMarkup(keyboardJSON, {chat_id: chatId, message_id: msg_id})
+
     } else if(command === 'deleteNotif'){
         await bot.sendMessage(chatId, 'введите ID фразы, для ее удаления')
         await db.updateSession(userId, 'Stage', 'deleteNotif')
@@ -120,10 +134,9 @@ bot.onText(/мои данные(?!.+)/, async msg => {
 
     if(await db.userExists(userId)){
         const userData = await db.getUserInf(userId)
-
-        console.log(userData)
+        const notifStatus = await db.getNotificationStatus(userId)
         let text = await createUserInfMsg(userData)
-        const keyboardJSON = JSON.stringify({inline_keyboard: inlineKeyboards.inf_msg_keyboard})
+        const keyboardJSON = JSON.stringify({inline_keyboard: inlineKeyboards.createInfMsgKeyboard(notifStatus)})
         await bot.sendMessage(chatId, text, {reply_markup: keyboardJSON, parse_mode: 'HTML'})
     } else {
         await bot.sendMessage(chatId, 'вы не авторизовались. Введите команду /start')
@@ -227,21 +240,42 @@ bot.onText(/^(?!\/)^(?!я попил)^(?!мои данные)^(?!моя сати
 });
 
 async function sendNotifLateUser(user_id){
+    const userInf = await db.getAllTodayDataForUser(user_id)
     const now = new Date()
-    const hours = now.getHours()
+    const nowMilsek = new Date().getTime()
+    const notifStatus = await db.getNotificationStatus(user_id)
 
-    let notification = 'ночь'
 
-    if (8 < hours && hours < 13){
-        const notifications = await db.getAllNotificationsForPartDay('morning')
-    }else if(13 <= hours && hours < 18){
-        const notifications = await db.getAllNotificationsForPartDay('afternoon')
-    }else if(18<= hours && hours < 22){
-        const notifications = await db.getAllNotificationsForPartDay('evening')
+    if((userInf.last_drinking_date/1000) + (userInf.notification_interval*3600) < nowMilsek/1000 && notifStatus && !userInf.completed_norm){
+        const now = new Date()
+        const hours = now.getHours()
+        let notification = 'ночь'
 
+        if (config["time interval_afternoon"].start < hours && hours < config["time interval_afternoon"].start) {
+
+            const notifications = await db.getAllNotificationsForPartDay('morning')
+            const numberNotif = utility.getRandomInt(0, notifications.length - 1)
+            notification = notifications[numberNotif].text
+
+        } else if (config["time interval_afternoon"].start <= hours && hours < config["time interval_afternoon"].end) {
+
+            const notifications = await db.getAllNotificationsForPartDay('afternoon')
+            const numberNotif = utility.getRandomInt(0, notifications.length - 1)
+            notification = notifications[numberNotif].text
+
+        } else if (config["time interval_evening"].start <= hours && hours < config["time interval_evening"].end) {
+
+            const notifications = await db.getAllNotificationsForPartDay('evening')
+            const numberNotif = utility.getRandomInt(0, notifications.length - 1)
+            notification = notifications[numberNotif].text
+
+        }
+        const chatId = await db.getUserChatId(user_id)
+        await bot.sendMessage(chatId, notification)
+        setTimeout(async () => {
+            await sendNotifLateUser(user_id)
+        },  userInf.notification_interval * 60 * 60 * 1000)
     }
-    const chatId = await db.getUserChatId(user_id)
-    await bot.sendMessage(chatId, notification)
 }
 
 setInterval(async () => {
@@ -257,3 +291,21 @@ setInterval(async () => {
         }
     }
 }, (5 * 1000));
+
+async function createStatistics() {
+    const userIDs = await db.getAllUsersIds()
+    const now = new Date()
+    const hours =  now.getHours()
+    const minutes = now.getMinutes()
+    let date_today = utility.formatDate(now)
+    for (let item of userIDs) {
+        let user_id = item['user_id']
+        await db.addUserStatistics(user_id, date_today)
+    }
+
+    setTimeout(async () => {
+        await createStatistics()
+    },  (24*60 - (hours*60 + minutes)) * 60 * 1000)
+}
+createStatistics()
+

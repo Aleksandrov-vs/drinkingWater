@@ -9,10 +9,15 @@ async function authentication(bot, userId, chatId, msg, session, db){
         const quantity_hours = utility.checkFloat(msg.text, 0, 24)
         if(quantity_hours!== false) {
             await db.updateUserRequest(userId, 'quantity_hours', quantity_hours)
-            await bot.sendMessage(chatId, 'пожалуйста,укажите свой вес (в кг)')
+            await bot.sendMessage(chatId, 'Пожалуйста,укажите свой <u>вес</u>(в кг)', {parse_mode: "HTML"})
             await db.updateSession(userId, 'Auth', 'wait_weight')
         } else{
-            await bot.sendMessage(chatId, 'вводите только цифры и знак запятой или точки. Введенное число не должно привышать 24 часов')
+            await bot.sendMessage(
+                chatId,
+                'Вводите только <u>цифры</u> и <u>знак запятой</u> или <u>точки</u>.\n' +
+                ' Введенное значение не должно привышать <u>24</u> чаосв',
+                {parse_mode: "HTML"}
+            )
         }
     }else if(state === 'wait_weight') {
         const userRequest = session['UserRequest']
@@ -23,12 +28,17 @@ async function authentication(bot, userId, chatId, msg, session, db){
             const keyboardJSON = JSON.stringify({inline_keyboard: inlineKeyboards.choice_interval})
             await bot.sendMessage(chatId, 'выбирете как часто получать уведомления', {reply_markup: keyboardJSON})
         } else{
-            await bot.sendMessage(chatId, 'вводите только цифры и знак запятой или точки. Введенный вес не должен привышать 2500 кг')
+            await bot.sendMessage(
+                chatId,
+                'Вводите только <u>цифры</u> и <u>знак запятой</u> или <u>точки</u>.\n' +
+                ' Введенный вес не должен привышать <u>2500</u> кг',
+                {parse_mode: "HTML"}
+                )
         }
     }
     else if(state === 'wait_interval') {
         const userRequest = session['UserRequest']
-        const interval = utility.checkInt(msg.text, 0, 200)
+        const interval = utility.checkFloat(msg.text, 0, 200)
         if(interval !== false) {
             userRequest['notification_interval'] = interval
             await createUser(chatId, userId, bot, db, userRequest)
@@ -36,7 +46,12 @@ async function authentication(bot, userId, chatId, msg, session, db){
             await db.updateSession(userId, 'Auth', 'start')
             await db.deleteUserRequest(userId)
         } else{
-            await bot.sendMessage(chatId, 'Вводите только цифры. Интервал должен быть целым числом не больше 200.')
+            await bot.sendMessage(
+                chatId,
+                'Вводите только <u>цифры</u> и <u>знак запятой</u> или <u>точки</u>.\n' +
+                ' Интервал должен не привышать <u>100</u> часов',
+                {parse_mode: "HTML"}
+            )
         }
     }
 }

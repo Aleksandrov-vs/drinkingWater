@@ -128,6 +128,35 @@ class Database {
         }
         return false
     }
+    async updateUserInf(userId, chatId, userRequest) {
+        const userExists = await this.userExists(userId)
+
+        if (userExists){
+            const request = `UPDATE users SET 
+                                gender = $1, 
+                                quantity_hours = $2,
+                                weight = $3,
+                                required_volume_water = $4,
+                                notification_interval = $5
+                                WHERE user_id = $6;`
+            const data = [
+                userRequest['gender'],
+                userRequest['quantity_hours'],
+                userRequest['weight'],
+                userRequest['required_volume_water'],
+                userRequest['notification_interval'],
+                userId
+            ]
+            try {
+                await this.pool.query(request, data)
+            } catch (error) {
+                console.log(error)
+                return false
+            }
+            return true
+        }
+        return false
+    }
 
     async userExists(userId){
         const request = 'SELECT EXISTS (SELECT 1 FROM users WHERE user_id=($1));'
@@ -195,7 +224,9 @@ class Database {
             WHERE
                 late_status = false
             AND
-                $1 - last_drinking_date  > (5*1000);`
+                $1 - last_drinking_date  > (5*1000)
+            AND
+                  notification_status = true;`
 
         try {
             const result = (await this.pool.query(request, [now])).rows[0]
@@ -333,7 +364,7 @@ class Database {
     }
 
     async getUserStatistics(userId){
-        const request = "SELECT EXTRACT(DAY FROM date) as day, EXTRACT(month FROM date) as month, quantity_intake_water, volume_water_drunk, completed_norm from statistics WHERE user_id=$1 AND statistics.date >= now()::date - interval '7 days' ;"
+        const request = "SELECT EXTRACT(DAY FROM date) as day, EXTRACT(month FROM date) as month, quantity_intake_water, volume_water_drunk, completed_norm from statistics WHERE user_id=$1 AND statistics.date >= now()::date - interval '7 days' ORDER BY date DESC;"
         try{
             const res = (await this.pool.query(request, [userId])).rows
             return res
@@ -414,6 +445,49 @@ class Database {
         } catch (error) {
             console.log(error)
             return true
+        }
+    }
+    async updateNotifStatusForUser(user_id, status) {
+        const request = 'UPDATE users SET notification_status = $2 WHERE user_id = $1; '
+        try {
+            const result = (await this.pool.query(request, [user_id, status])).rows
+            return result
+        } catch (e) {
+            console.log('updateNotifStatusForUser', e)
+            return false
+        }
+    }
+
+    async getNotificationStatus(userId){
+        const request = 'SELECT notification_status FROM users WHERE user_id = $1;'
+        try{
+            const res = (await this.pool.query(request, [userId])).rows[0]
+            return res['notification_status']
+        }catch (err){
+            console.log(err)
+            return false
+        }
+    }
+
+    async getNotificationInterval(userId){
+        const request = 'SELECT notification_interval FROM users WHERE user_id = $1;'
+        try{
+            const res = (await this.pool.query(request, [userId])).rows[0]
+            return res['notification_interval']
+        }catch (err){
+            console.log(err)
+            return false
+        }
+    }
+
+    async getAllTodayDataForUser(userId){
+        const request = 'select * FROM users LEFT JOIN statistics s on users.user_id = s.user_id WHERE users.user_id = $1 AND s.date = now()::date;'
+        try{
+            const res = (await this.pool.query(request, [userId])).rows[0]
+            return res
+        }catch (err){
+            console.log(err)
+            return false
         }
     }
 }

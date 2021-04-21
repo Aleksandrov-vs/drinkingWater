@@ -11,7 +11,11 @@ async function choiceInterval(userId, chatId, bot, db, callback_query, msg_id) {
 
     } else if(intervalId === 'custm') {
         await db.updateSession(userId, 'Auth', 'wait_interval')
-        await bot.sendMessage(chatId, 'введите как часто вы хочтите получать уведомления (в часах)')
+        await bot.sendMessage(
+            chatId,
+            'введите как часто вы хочтите получать уведомления (в часах)',
+        {parse_mode: "HTML"}
+        )
     }
 
     const keyboardJSON = JSON.stringify({inline_keyboard: [[]]})
