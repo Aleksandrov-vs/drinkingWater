@@ -41,17 +41,38 @@ bot.onText(/\/start/, async msg => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
     const userName = msg.from.first_name
+    if(await db.userExists(userId)){
+        await bot.sendMessage(chatId, 'ты уже тут')
+    } else {
+        const keyboard = inlineKeyboards.choice_gender
+        const keyboardJSON = JSON.stringify({inline_keyboard: keyboard})
+        await db.createSession(userId)
+        await db.updateUserRequest(userId, 'user_name', userName)
+        const text = `Привет, <b>${userName}</b> теперь я ваш виртуальный помощник \n\n` +
+            'Начните вести здоровый образ жизни с водно-солевого баланса организма \n\n' +
+            '<b>Я помогу вам:</b>\n\n' +
+            '💧отслеживать количество выпитой воды за сутки \n' +
+            '💧превратить потребление воды в полезную привычку\n' +
+            '💧следить за гидро балансом исходя из индивидуальных параметров\n\n\n\n' +
+            '<i>*при расчете рассчитывается примерное количество воды</i>'
+        await bot.sendMessage(chatId, text, {parse_mode: "HTML"})
+        await bot.sendMessage(chatId, 'Пожалуйста, укажите свой <u>пол</u>', {
+            reply_markup: keyboardJSON,
+            parse_mode: 'HTML'
+        })
+    }
+});
 
-    const keyboard = inlineKeyboards.choice_gender
-    const keyboardJSON = JSON.stringify({inline_keyboard: keyboard})
-    await db.createSession(userId)
-    await db.updateUserRequest(userId, 'user_name', userName)
-    const text = `Привет, <b>${userName}</b>!\nЯ бот, который поможет тебе контролировать свой водный баланс.\nДля начала работы придется указать некоторы данные😕`
-    await bot.sendMessage(chatId, text, {parse_mode:"HTML"})
-    await bot.sendMessage(chatId, 'Пожалуйста, укажите свой <u>пол</u>',{
-        reply_markup: keyboardJSON,
-        parse_mode:'HTML'
-    })
+bot.onText(/\/disconnect/, async msg => {
+
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    if(await db.userExists(userId)) {
+        await db.deleteUser(userId)
+        await bot.sendMessage(chatId, 'вы отключены от бота. Чтобы подключиться еще раз введите /start')
+    } else{
+        await bot.sendMessage(chatId, 'вы не авторизовались. Введите /start')
+    }
 });
 
 bot.on('callback_query', async (msg) => {
@@ -76,7 +97,7 @@ bot.on('callback_query', async (msg) => {
         await bot.editMessageReplyMarkup(keyboardJSON, {chat_id: chatId, message_id: msg_id})
 
     } else if(command === 'enableNotif'){
-
+        await db.updateLateStatusForUser(userId, false)
         await db.updateNotifStatusForUser(userId, true)
         const keyboardJSON = JSON.stringify({inline_keyboard:  inlineKeyboards.createInfMsgKeyboard(true)})
         await bot.editMessageReplyMarkup(keyboardJSON, {chat_id: chatId, message_id: msg_id})
@@ -195,7 +216,8 @@ bot.onText(/изменить мотивационные фразы(?!.+)/, async
 });
 
 
-bot.onText(/я попил(?!.+)/, async msg => {
+
+bot.onText(/💧(?!.+)/, async msg => {
 
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -208,7 +230,7 @@ bot.onText(/я попил(?!.+)/, async msg => {
     }
 });
 
-bot.onText(/^(?!\/)^(?!я попил)^(?!мои данные)^(?!моя сатистика)^(?!управление пользователями)^(?!изменить мотивационные фразы)/, async msg => {
+bot.onText(/^(?!\/)^(?!💧)^(?!мои данные)^(?!моя сатистика)^(?!управление пользователями)^(?!изменить мотивационные фразы)/, async msg => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
 
@@ -226,7 +248,7 @@ bot.onText(/^(?!\/)^(?!я попил)^(?!мои данные)^(?!моя сати
             await deleteNotification(bot, userId, chatId, msg, session, db)
         }else if (Stage === 'addNotif'){
             await addNotification(bot, userId, chatId, msg, session, db)
-        } else if (Stage === 'choiceUser'){
+        } else if (Stage === 'choiceUserchoiceUser'){
             if(await db.isAdmin(userId)){
                 await workingWithUser(bot, userId, chatId, msg, session, db)
             } else {
@@ -246,7 +268,7 @@ async function sendNotifLateUser(user_id){
     const notifStatus = await db.getNotificationStatus(user_id)
 
 
-    if((userInf.last_drinking_date/1000) + (userInf.notification_interval*3600) < nowMilsek/1000 && notifStatus && !userInf.completed_norm){
+    if((userInf.last_drinking_date/1000) + (userInf.notification_interval*3600) <= nowMilsek/1000 && notifStatus && !userInf.completed_norm){
         const now = new Date()
         const hours = now.getHours()
         let notification = 'ночь'
@@ -282,7 +304,7 @@ setInterval(async () => {
     const now = new Date()
     const nowMilsek = new Date().getTime()
     const hours =  now.getHours()
-    if (8 <= hours && hours <= 22) {
+    if (config.time_interval_send_notif.start <= hours && hours <= config.time_interval_send_notif.end) {
         const userIDs = await db.getLaterUsers(nowMilsek)
         for (let item in userIDs) {
             const user_id = userIDs['user_id']
@@ -307,5 +329,5 @@ async function createStatistics() {
         await createStatistics()
     },  (24*60 - (hours*60 + minutes)) * 60 * 1000)
 }
-createStatistics()
+createStatistics().then(res =>{console.log('done')})
 

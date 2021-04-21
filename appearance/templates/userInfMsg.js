@@ -8,14 +8,14 @@ function createUserInfMsg(userData) {
         gender = 'мужской'
     }
 
-    let msg  =`<b>вы указали данные</b>
-имя: ${userData['user_name']}
-пол: ${gender}
-время занятием спорта: ${userData['quantity_hours']}
-ваш вес: ${userData['weight']}
-частота получения уведомлений: ${userData['notification_interval']}
+    let msg  =`<b>данные для ${userData['user_name']}</b>\n
+<b>имя</b>: ${userData['user_name']} 
+<b>пол</b>: ${gender}
+<b>время занятий спортом</b>: ${userData['quantity_hours']} часа в день
+<b>ваш вес</b>: ${userData['weight']} кг
+<b>частота получения уведомлений</b>: раз в ${userData['notification_interval']} часа
 
-Мы советуем вам принимать ${userData['required_volume_water']} литров воды в сутки
+Мы советуем вам принимать <u>${userData['required_volume_water']} литров</u> воды в сутки!
 `
     return msg
 }

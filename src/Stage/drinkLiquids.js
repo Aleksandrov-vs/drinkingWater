@@ -5,7 +5,16 @@ async function drinkLiquids(bot, userId, chatId, msg, session, db) {
     const userRequest = session['UserRequest']
 
     if(state === 'wait_amount_drink'){
-        const amount_drink = parseFloat(msg.text)
+        const amount_drink = utility.checkFloat(msg.text, 0, 2000000)
+        if(amount_drink === false){
+            await bot.sendMessage(
+                chatId,
+                'Вводите только <u>цифры</u> и <u>знак запятой</u> или <u>точки</u>.\n' +
+                'Количество литров не больше <u>2000000</u> ',
+                {parse_mode: "HTML"}
+            )
+            return 0
+        }
         const drinkName = userRequest['drink_name']
         const requireVolume = await db.getRequiredVolumeForUser(userId)
 
@@ -24,12 +33,12 @@ async function drinkLiquids(bot, userId, chatId, msg, session, db) {
 
         if(requireVolume <= volume_water_drunk){
             const notifications = [
-               'Отличный результат',
-               'Ты молодец',
-               'Так держать',
-                'Я тобой горжусь'
+                'Отличный результат!',
+                'Ты молодец!',
+                'Так держать!',
+                'Я тобой горжусь!'
             ]
-            await bot.sendMessage(chatId, `Вы выполнили дневную норму. ${notifications[utility.getRandomInt(0, 3)]}`)
+            await bot.sendMessage(chatId, `Дневная норма выполнена! ${notifications[utility.getRandomInt(0, 3)]}`)
             await db.updateUserStatistics(userId, quantity_intake_water, volume_water_drunk, true)
 
 
@@ -42,7 +51,7 @@ async function drinkLiquids(bot, userId, chatId, msg, session, db) {
         await db.updateLastDrinkingDate(userId, now)
 
 
-
+        await db.updateLateStatusForUser(userId, false)
         await db.updateSession(userId,'Stage', 'start')
         await db.updateSession(userId,'choiceDrink', 'start')
         await db.deleteUserRequest(userId)

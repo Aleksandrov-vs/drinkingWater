@@ -26,7 +26,7 @@ async function authentication(bot, userId, chatId, msg, session, db){
             await db.updateUserRequest(userId, 'weight', weight)
 
             const keyboardJSON = JSON.stringify({inline_keyboard: inlineKeyboards.choice_interval})
-            await bot.sendMessage(chatId, 'выбирете как часто получать уведомления', {reply_markup: keyboardJSON})
+            await bot.sendMessage(chatId, 'выбирете частоту получения уведомлений', {reply_markup: keyboardJSON})
         } else{
             await bot.sendMessage(
                 chatId,

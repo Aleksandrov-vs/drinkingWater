@@ -21,6 +21,9 @@ async function workingWithUser(bot, userId, chatId, msg, session, db){
                         parse_mode:"HTML"
                     }
                     )
+                await db.updateSession(userId, 'Stage', 'start')
+                await db.updateSession(userId, 'choiceUser', 'start')
+                await db.deleteUserRequest(userId)
             }else{
                 await bot.sendMessage(chatId, 'такого пользователя нет')
             }

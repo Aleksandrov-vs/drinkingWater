@@ -14,6 +14,7 @@ async function changeRequiredVolume(bot, userId, chatId, msg, session, db) {
             if(userInf['required_volume_water'] > userInf['volume_water_drunk']){
                 await db.updateUserStatistics(userId, userInf.quantity_intake_water, userInf.volume_water_drunk, false )
             }
+            await db.updateLateStatusForUser(userId, false)
 
             await db.updateSession(userId, 'Stage', 'start')
             await db.updateSession(userId, 'changeRequiredVolume', 'start')

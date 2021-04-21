@@ -224,7 +224,7 @@ class Database {
             WHERE
                 late_status = false
             AND
-                $1 - last_drinking_date  > (5*1000)
+                $1 - last_drinking_date  > notification_interval * 60 * 60 * 1000
             AND
                   notification_status = true;`
 

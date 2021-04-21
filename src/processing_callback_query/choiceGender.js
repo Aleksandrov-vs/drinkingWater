@@ -13,7 +13,7 @@ async function choiceGender(userId, chatId, bot, db, callback_query, msg_id) {
     await bot.sendMessage(
         chatId,
         'Пожалуйста, введите <u>время активного занятия спортом</u>(В часах)\n' +
-        ' <i>при отсутствии оных необходимо ставить 0</i> ',
+        ' <i>если вы не занимаетесь спортом - впишите 0</i> ',
         {parse_mode:"HTML"}
     )
     await db.updateSession(userId, 'Stage', 'Auth')

@@ -57,21 +57,6 @@ module.exports = {
             }
         ]
     ],
-    inf_msg_keyboard : [
-        [
-            {
-                text: 'изменить данные о себе',
-                callback_data: 'changeUserInf'
-            }
-        ],
-        [
-            {
-                text: 'указать другое количество воды в сутки',
-                callback_data: 'changeRequiredVolume'
-            }
-        ]
-
-    ],
     choice_drink : [
             [
                 {
@@ -113,4 +98,38 @@ module.exports = {
     ]
 }
 
+
+module.exports.createInfMsgKeyboard = function createInfMsgKeyboard(notifStatus){
+    let text = ''
+    let callbackQuery = ''
+    if (notifStatus === false){
+        text = 'включить уведомления'
+        callbackQuery = 'enableNotif'
+    } else {
+        text = 'выключить уведомления'
+        callbackQuery = 'disableNotif'
+    }
+
+    return [
+        [
+            {
+                text: 'изменить данные о себе',
+                callback_data: 'changeUserInf'
+            }
+        ],
+        [
+            {
+                text: 'указать другое количество воды в сутки',
+                callback_data: 'changeRequiredVolume'
+            }
+        ],
+        [
+            {
+                text: `${text}`,
+                callback_data: `${callbackQuery}`
+            }
+        ]
+
+    ]
+}
 

@@ -16,11 +16,12 @@ const commands = [
         quantity_hours FLOAT DEFAULT 0,
         weight FLOAT NOT NULL, 
         required_volume_water FLOAT NOT NULL,
-        notification_interval INTEGER DEFAULT 3,
+        notification_interval FLOAT DEFAULT 3,
         last_drinking_date BIGINT,
-        late_status  BOOLEAN NOT NULL DEFAULT FALSE,
+        late_status  BOOLEAN  DEFAULT FALSE,
         user_id integer PRIMARY KEY,
         chat_id integer NOT NULL,
+        notification_status BOOLEAN DEFAULT TRUE,
         permission VARCHAR(30) DEFAULT 'client'
     );`,
     `CREATE TABLE sessions

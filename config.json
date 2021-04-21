@@ -3,5 +3,21 @@
   "databaseURL": "postgresql://sofi:sofisofi@localhost/drinking_water",
   "token": "1651052516:AAER8hDEf4ytHzk6CSkj8gYgzLPNrIvPnhY",
   "db_user": "sofi",
-  "db_password": "sofisofi"
+  "db_password": "sofisofi",
+  "time interval_morning": {
+    "start": 8,
+    "end": 12
+  },
+  "time interval_afternoon": {
+    "start": 12,
+    "end": 18
+  },
+  "time interval_evening": {
+    "start": 18,
+    "end": 23
+  },
+  "time_interval_send_notif": {
+    "start": 8,
+    "end": 23
+  }
 }
