@@ -1,0 +1,16 @@
+{
+  "name": "drinkingwater",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "*",
+    "node-telegram-bot-api": "^0.52.0",
+    "pg": "^8.6.0"
+  }
+}

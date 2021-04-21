@@ -1,0 +1,7 @@
+{
+  "authToken": "e99146ff-2f62-4acb-b9b9-795ce7fbe614",
+  "databaseURL": "postgresql://sofi:sofisofi@localhost/drinking_water",
+  "token": "1651052516:AAER8hDEf4ytHzk6CSkj8gYgzLPNrIvPnhY",
+  "db_user": "sofi",
+  "db_password": "sofisofi"
+}
