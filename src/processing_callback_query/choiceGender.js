@@ -12,7 +12,7 @@ async function choiceGender(userId, chatId, bot, db, callback_query, msg_id) {
     await bot.editMessageReplyMarkup(keyboardJSON, {chat_id: chatId, message_id: msg_id})
     await bot.sendMessage(
         chatId,
-        'Пожалуйста, введите <u>время активного занятия спортом</u>(В часах)\n' +
+        'Пожалуйста, введите <u>время активного занятия спортом</u>\n(В часах)\n' +
         ' <i>если вы не занимаетесь спортом - впишите 0</i> ',
         {parse_mode:"HTML"}
     )

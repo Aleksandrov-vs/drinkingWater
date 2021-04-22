@@ -41,7 +41,6 @@ async function drinkLiquids(bot, userId, chatId, msg, session, db) {
             await bot.sendMessage(chatId, `Дневная норма выполнена! ${notifications[utility.getRandomInt(0, 3)]}`)
             await db.updateUserStatistics(userId, quantity_intake_water, volume_water_drunk, true)
 
-
         }else{
             await bot.sendMessage(chatId, `сегодня вы выпили ${volume_water_drunk} литров воды. Осталось выпить ${requireVolume - volume_water_drunk} литров`)
             await db.updateUserStatistics(userId, quantity_intake_water, volume_water_drunk, false)

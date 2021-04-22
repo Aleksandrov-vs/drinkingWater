@@ -11,6 +11,7 @@ async function changeRequiredVolume(bot, userId, chatId, msg, session, db) {
             await db.updateRequiredVolumeWaterForUser(userId, customVolume)
             await bot.sendMessage(chatId, `вы изменили нужное колиество воды на: ${customVolume} литров в день`)
             const userInf = await db.getAllTodayDataForUser(userId)
+
             if(userInf['required_volume_water'] > userInf['volume_water_drunk']){
                 await db.updateUserStatistics(userId, userInf.quantity_intake_water, userInf.volume_water_drunk, false )
             }

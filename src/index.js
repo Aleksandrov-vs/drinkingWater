@@ -19,9 +19,7 @@ const workingWithUser = require('./Stage/workingWithUser')
 const menu = require('../appearance/keyboard/menu')
 const utility = require('./utility')
 
-
-
-
+// создание бота
 const bot = new TelegramBot(config.token, { polling: {
         interval:300,
         autoStart: true,
@@ -30,6 +28,7 @@ const bot = new TelegramBot(config.token, { polling: {
         }
     }
 });
+//база данных
 const db = new Database(config.databaseURL);
 const today = new Date();
 
@@ -75,6 +74,8 @@ bot.onText(/\/disconnect/, async msg => {
     }
 });
 
+
+// отлов и обработка ответов от inline клавиатур
 bot.on('callback_query', async (msg) => {
     const chatId = msg.message.chat.id;
     const userId = msg.from.id;
@@ -216,7 +217,6 @@ bot.onText(/изменить мотивационные фразы(?!.+)/, async
 });
 
 
-
 bot.onText(/💧(?!.+)/, async msg => {
 
     const chatId = msg.chat.id;
@@ -230,6 +230,8 @@ bot.onText(/💧(?!.+)/, async msg => {
     }
 });
 
+
+// хендлер, реаигурующий на любой текст, кроме комманд и текста кнопок. Реализация сценариев
 bot.onText(/^(?!\/)^(?!💧)^(?!мои данные)^(?!моя сатистика)^(?!управление пользователями)^(?!изменить мотивационные фразы)/, async msg => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -261,6 +263,7 @@ bot.onText(/^(?!\/)^(?!💧)^(?!мои данные)^(?!моя сатистик�
     }
 });
 
+//отправка сообщений с уведомлениями каждые notifications_interval каждому юзеру
 async function sendNotifLateUser(user_id){
     const userInf = await db.getAllTodayDataForUser(user_id)
     const now = new Date()
@@ -300,6 +303,7 @@ async function sendNotifLateUser(user_id){
     }
 }
 
+//поиск пользователей, которым нужно отослать уведомление
 setInterval(async () => {
     const now = new Date()
     const nowMilsek = new Date().getTime()
@@ -314,6 +318,8 @@ setInterval(async () => {
     }
 }, (5 * 1000));
 
+
+//создание новой записи в таблице statistics
 async function createStatistics() {
     const userIDs = await db.getAllUsersIds()
     const now = new Date()

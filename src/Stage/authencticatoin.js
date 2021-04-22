@@ -9,13 +9,13 @@ async function authentication(bot, userId, chatId, msg, session, db){
         const quantity_hours = utility.checkFloat(msg.text, 0, 24)
         if(quantity_hours!== false) {
             await db.updateUserRequest(userId, 'quantity_hours', quantity_hours)
-            await bot.sendMessage(chatId, 'Пожалуйста,укажите свой <u>вес</u>(в кг)', {parse_mode: "HTML"})
+            await bot.sendMessage(chatId, 'Пожалуйста,укажите свой <u>вес</u> (в кг)', {parse_mode: "HTML"})
             await db.updateSession(userId, 'Auth', 'wait_weight')
         } else{
             await bot.sendMessage(
                 chatId,
                 'Вводите только <u>цифры</u> и <u>знак запятой</u> или <u>точки</u>.\n' +
-                ' Введенное значение не должно привышать <u>24</u> чаосв',
+                ' Введенное значение не должно привышать <u>24</u> часов',
                 {parse_mode: "HTML"}
             )
         }
