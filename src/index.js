@@ -322,6 +322,7 @@ async function createStatistics() {
     let date_today = utility.formatDate(now)
     for (let item of userIDs) {
         let user_id = item['user_id']
+        await db.updateLateStatusForUser(user_id, false)
         await db.addUserStatistics(user_id, date_today)
     }
 

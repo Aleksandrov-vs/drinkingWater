@@ -242,7 +242,6 @@ class Database {
 
         try {
             const result = (await this.pool.query(request, [userId])).rows[0]
-            console.log('ad')
             return result['volume_water_drunk']
         }catch (err) {
             console.log(err)
@@ -256,7 +255,6 @@ class Database {
 
         try {
             const result = (await this.pool.query(request, [userId])).rows[0]
-            console.log('ad')
             return result['required_volume_water']
         }catch (err) {
             console.log(err)

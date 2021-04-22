@@ -2,7 +2,6 @@ function createUserStatisticsMsg(userData) {
     let sum_intake = 0
     let sum_volume_drunk = 0
     let sum_completed_norm = 0
-    console.log(userData)
     let daily_statistics  =``
 
     for(let i in userData){
