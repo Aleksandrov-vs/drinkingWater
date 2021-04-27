@@ -1,4 +1,4 @@
-const utility = require('../../src/utility');
+const utils = require('../../src/utils');
 
 
 
@@ -25,7 +25,7 @@ function listNotifForPartDay(notifications, partDay) {
         for(let numberStr = 0; numberStr < (notif.text.length/26); numberStr++){
             let id = '   '
             if(numberStr == 0){
-                id = utility.formatString(notif.id, 3)
+                id = utils.formatString(notif.id, 3)
             }
             msg += `<code>`+`${id}|</code>` + notif.text.substring(26*numberStr, 26*numberStr + 26) + '\n'
         }

@@ -1,4 +1,4 @@
-const utility = require('../utility')
+const utility = require('../utils')
 
 async function addNotification(bot, userId, chatId, msg, session, db) {
     const state = session['addNotif']

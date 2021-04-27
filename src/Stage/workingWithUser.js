@@ -2,7 +2,7 @@ const createUserInfMsg = require('../../appearance/templates/userInfMsg')
 const createUserStatisticsMsg =require('../../appearance/templates/userStatisticsMsg')
 const menu = require('../../appearance/keyboard/menu')
 const inlineKeyboards = require('../../appearance/keyboard/inline_keyboards')
-const utility = require('../utility')
+const utility = require('../utils')
 
 async function workingWithUser(bot, userId, chatId, msg, session, db){
     const state = session['choiceUser']

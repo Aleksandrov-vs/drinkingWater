@@ -1,7 +1,7 @@
-const utility = require('../utility')
+const utils = require('../utils')
 async function deleteNotification(bot, userId, chatId, msg, session, db) {
 
-    const notifId = utility.checkInt(msg.text, 0, 5000)
+    const notifId = utils.checkInt(msg.text, 0, 5000)
     if(notifId !== false && await db.notificationExists(notifId)) {
         await db.deleteNotification(notifId)
         await bot.sendMessage(chatId, 'вы удалили мотивационную фразу')

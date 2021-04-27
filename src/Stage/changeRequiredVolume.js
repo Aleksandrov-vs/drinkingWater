@@ -1,4 +1,4 @@
-const utility = require('../utility')
+const utils = require('../utils')
 
 
 async function changeRequiredVolume(bot, userId, chatId, msg, session, db) {
@@ -6,7 +6,7 @@ async function changeRequiredVolume(bot, userId, chatId, msg, session, db) {
     const userRequest = session['UserRequest']
 
     if(state === 'wait_volume'){
-        const customVolume = utility.checkFloat(msg.text, 0, 100)
+        const customVolume = utils.checkFloat(msg.text, 0, 100)
         if (customVolume !== false){
             await db.updateRequiredVolumeWaterForUser(userId, customVolume)
             await bot.sendMessage(chatId, `вы изменили нужное колиество воды на: ${customVolume} литров в день`)

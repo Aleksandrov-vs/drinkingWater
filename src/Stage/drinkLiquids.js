@@ -1,11 +1,11 @@
-const utility = require('../utility')
+const utils = require('../utils')
 
 async function drinkLiquids(bot, userId, chatId, msg, session, db) {
     const state = session['choiceDrink']
     const userRequest = session['UserRequest']
 
     if(state === 'wait_amount_drink'){
-        const amount_drink = utility.checkFloat(msg.text, 0, 2000000)
+        const amount_drink = utils.checkFloat(msg.text, 0, 2000000)
         if(amount_drink === false){
             await bot.sendMessage(
                 chatId,
@@ -38,7 +38,7 @@ async function drinkLiquids(bot, userId, chatId, msg, session, db) {
                 'Так держать!',
                 'Я тобой горжусь!'
             ]
-            await bot.sendMessage(chatId, `Дневная норма выполнена! ${notifications[utility.getRandomInt(0, 3)]}`)
+            await bot.sendMessage(chatId, `Дневная норма выполнена! ${notifications[utils.getRandomInt(0, 3)]}`)
             await db.updateUserStatistics(userId, quantity_intake_water, volume_water_drunk, true)
 
         }else{

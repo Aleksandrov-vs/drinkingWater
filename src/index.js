@@ -17,7 +17,7 @@ const changeRequiredVolume = require('./Stage/changeRequiredVolume')
 const getUsersList = require('./getUsersList')
 const workingWithUser = require('./Stage/workingWithUser')
 const menu = require('../appearance/keyboard/menu')
-const utility = require('./utility')
+const utils = require('./utils')
 
 // создание бота
 const bot = new TelegramBot(config.token, { polling: {
@@ -279,19 +279,19 @@ async function sendNotifLateUser(user_id){
         if (config["time interval_afternoon"].start < hours && hours < config["time interval_afternoon"].start) {
 
             const notifications = await db.getAllNotificationsForPartDay('morning')
-            const numberNotif = utility.getRandomInt(0, notifications.length - 1)
+            const numberNotif = utils.getRandomInt(0, notifications.length - 1)
             notification = notifications[numberNotif].text
 
         } else if (config["time interval_afternoon"].start <= hours && hours < config["time interval_afternoon"].end) {
 
             const notifications = await db.getAllNotificationsForPartDay('afternoon')
-            const numberNotif = utility.getRandomInt(0, notifications.length - 1)
+            const numberNotif = utils.getRandomInt(0, notifications.length - 1)
             notification = notifications[numberNotif].text
 
         } else if (config["time interval_evening"].start <= hours && hours < config["time interval_evening"].end) {
 
             const notifications = await db.getAllNotificationsForPartDay('evening')
-            const numberNotif = utility.getRandomInt(0, notifications.length - 1)
+            const numberNotif = utils.getRandomInt(0, notifications.length - 1)
             notification = notifications[numberNotif].text
 
         }
@@ -325,7 +325,7 @@ async function createStatistics() {
     const now = new Date()
     const hours =  now.getHours()
     const minutes = now.getMinutes()
-    let date_today = utility.formatDate(now)
+    let date_today = utils.formatDate(now)
     for (let item of userIDs) {
         let user_id = item['user_id']
         await db.updateLateStatusForUser(user_id, false)

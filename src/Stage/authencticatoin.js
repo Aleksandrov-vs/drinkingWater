@@ -1,12 +1,12 @@
 const inlineKeyboards = require('../../appearance/keyboard/inline_keyboards');
 const createUser = require('../createUser')
-const utility = require('../utility')
+const utils = require('../utils')
 
 async function authentication(bot, userId, chatId, msg, session, db){
     const state = session['Auth']
 
     if(state === 'wait_time'){
-        const quantity_hours = utility.checkFloat(msg.text, 0, 24)
+        const quantity_hours = utils.checkFloat(msg.text, 0, 24)
         if(quantity_hours!== false) {
             await db.updateUserRequest(userId, 'quantity_hours', quantity_hours)
             await bot.sendMessage(chatId, 'Пожалуйста,укажите свой <u>вес</u> (в кг)', {parse_mode: "HTML"})
@@ -21,7 +21,7 @@ async function authentication(bot, userId, chatId, msg, session, db){
         }
     }else if(state === 'wait_weight') {
         const userRequest = session['UserRequest']
-        const weight = utility.checkFloat(msg.text, 0, 400)
+        const weight = utils.checkFloat(msg.text, 0, 400)
         if(weight!== false) {
             await db.updateUserRequest(userId, 'weight', weight)
 
@@ -38,7 +38,7 @@ async function authentication(bot, userId, chatId, msg, session, db){
     }
     else if(state === 'wait_interval') {
         const userRequest = session['UserRequest']
-        const interval = utility.checkFloat(msg.text, 0, 200)
+        const interval = utils.checkFloat(msg.text, 0, 200)
         if(interval !== false) {
             userRequest['notification_interval'] = interval
             await createUser(chatId, userId, bot, db, userRequest)

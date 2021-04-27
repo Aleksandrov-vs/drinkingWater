@@ -1,7 +1,7 @@
 const createUserInfMsg = require('../appearance/templates/userInfMsg')
 const menu = require('../appearance/keyboard/menu')
 const inlineKeyboards = require('../appearance/keyboard/inline_keyboards')
-const utility = require('./utility')
+const utils = require('./utils')
 
 async function createUser(chatId, userId, bot, db, userRequest){
     let requiredVolumeWater = 0
@@ -33,7 +33,7 @@ async function createUser(chatId, userId, bot, db, userRequest){
     const keyboardJSON = JSON.stringify({inline_keyboard:  inlineKeyboards.createInfMsgKeyboard()})
 
     const now = new Date()
-    let date_today = utility.formatDate(now)
+    let date_today = utils.formatDate(now)
     await db.addUserStatistics(userId, date_today)
     await bot.sendMessage(chatId, text, {reply_markup: keyboardJSON, parse_mode: 'HTML'})
     await bot.sendMessage(
